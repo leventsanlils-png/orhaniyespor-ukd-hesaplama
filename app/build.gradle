@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.orhaniyespor.ukd'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.orhaniyespor.ukd'
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+
+    signingConfigs {
+        release {
+            // GitHub Actions'ta otomatik oluşturulan imza anahtarı kullanılır
+            def ks = file(System.getenv('UKD_KEYSTORE') ?: 'none')
+            if (ks.exists()) {
+                storeFile ks
+                storePassword System.getenv('UKD_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('UKD_KEY_ALIAS')
+                keyPassword System.getenv('UKD_KEYSTORE_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig file(System.getenv('UKD_KEYSTORE') ?: 'none').exists() ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
